@@ -10,6 +10,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsCount = document.getElementById('results-count');
     const clearFiltersButton = document.getElementById('clear-filters');
     const filterContainer = document.querySelector('.bg-white.sticky');
+    
+    // Add floating filter button to the DOM
+    const filterButton = document.createElement('button');
+    filterButton.id = 'filter-toggle';
+    filterButton.className = 'fixed bottom-4 left-4 z-20 bg-red-700 text-white p-3 rounded-full shadow-lg md:hidden';
+    filterButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+    `;
+    document.body.appendChild(filterButton);
+    
+    // Force hide filters on mobile immediately
+    if (window.innerWidth < 768) {
+        // Add a small delay to ensure the class is applied after the DOM is fully loaded
+        setTimeout(() => {
+            filterContainer.classList.add('filters-hidden');
+        }, 0);
+    }
+    
+    // Toggle filters visibility when button is clicked
+    filterButton.addEventListener('click', () => {
+        filterContainer.classList.toggle('filters-hidden');
+        // No need to add popup styling, just show/hide the existing filters
+    });
 
     // Performance optimization - Create document fragment for batch DOM updates
     const createCardFragment = (data) => {
@@ -145,6 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         renderResults(filteredData);
+        
+        // Hide filters after applying on mobile
+        if (window.innerWidth < 768) {
+            filterContainer.classList.add('filters-hidden');
+            filterContainer.classList.remove('filter-popup');
+        }
     }, 200); // 200ms debounce for smoother filtering
 
     // Global functions to filter by reader or matam
@@ -183,59 +214,61 @@ document.addEventListener('DOMContentLoaded', () => {
     readerFilter.addEventListener('input', applyFilters);
     matamFilter.addEventListener('input', applyFilters);
     timeFilter.addEventListener('change', applyFilters);
-    clearFiltersButton.addEventListener('click', clearFilters);
-
-    // Scroll Hide Logic for Mobile - Improved with throttling
-    // Add this code to your main.js file to handle filter bar visibility on scroll
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        // Get the filter container
-        const filterContainer = document.querySelector('.bg-white.sticky');
-        const filterToggleBtn = document.getElementById('filter-toggle');
+    clearFiltersButton.addEventListener('click', () => {
+        clearFilters();
         
-        // Variables for scroll detection
-        let lastScrollTop = 0;
-        const scrollThreshold = 50;
-        let ticking = false;
-    
-        // Handle scroll events with requestAnimationFrame for better performance
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    
-                    // Only apply filter hiding on mobile/tablet
-                    if (window.innerWidth < 768) {
-                        if (currentScrollTop > lastScrollTop && currentScrollTop > scrollThreshold) {
-                            filterContainer.classList.add('filters-hidden');
-                        } else if (currentScrollTop < lastScrollTop) {
-                            filterContainer.classList.remove('filters-hidden');
-                        }
-                    } else {
-                        // Always show filters on desktop
-                        filterContainer.classList.remove('filters-hidden');
-                    }
-                    
-                    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
-                    ticking = false;
-                });
-                
-                ticking = true;
-            }
-        });
-    
-        // Add resize listener to handle responsive behavior
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                filterContainer.classList.remove('filters-hidden');
-            }
-        });
-        
-        // Add a toggle button for mobile to show/hide filters manually
-        if (filterToggleBtn) {
-            filterToggleBtn.addEventListener('click', () => {
-                filterContainer.classList.toggle('filters-hidden');
-            });
+        // Hide filters after clearing on mobile
+        if (window.innerWidth < 768) {
+            filterContainer.classList.add('filters-hidden');
+            filterContainer.classList.remove('filter-popup');
         }
     });
+
+    // Remove the duplicate DOMContentLoaded event listener
+    // and keep only the scroll handling code
+    
+    // Variables for scroll detection
+    let lastScrollTop = 0;
+    const scrollThreshold = 50;
+    let ticking = false;
+
+    // Handle scroll events with requestAnimationFrame for better performance
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                // Only apply filter hiding on mobile/tablet
+                if (window.innerWidth < 768) {
+                    if (currentScrollTop > lastScrollTop && currentScrollTop > scrollThreshold) {
+                        filterContainer.classList.add('filters-hidden');
+                        filterContainer.classList.remove('filter-popup');
+                    }
+                } else {
+                    // Always show filters on desktop
+                    filterContainer.classList.remove('filters-hidden');
+                    filterContainer.classList.remove('filter-popup');
+                }
+                
+                lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+                ticking = false;
+            });
+            
+            ticking = true;
+        }
+    });
+
+    // Add resize listener to handle responsive behavior
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            filterContainer.classList.remove('filters-hidden');
+            filterContainer.classList.remove('filter-popup');
+        } else {
+            filterContainer.classList.add('filters-hidden');
+        }
+    });
+
+    // Initialize the page
+    populateCityFilter();
+    renderResults(majalisData);
 });

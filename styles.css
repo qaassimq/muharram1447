@@ -109,3 +109,131 @@ select {
     transform: scale(1.1);
     color: #dc2626;
 }
+
+
+/* Add these styles at the end of your styles.css file */
+
+/* Filter popup styling for mobile */
+.filter-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 100;
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Floating filter button styling */
+#filter-toggle {
+    transition: all 0.3s ease;
+    display: none;
+}
+
+#filter-toggle:hover {
+    transform: scale(1.1);
+    background-color: #b91c1c;
+}
+
+/* Show filter button only on mobile */
+@media (max-width: 767px) {
+    #filter-toggle {
+        display: flex;
+    }
+    
+    /* Ensure the filter container is properly hidden initially */
+    .filters-hidden {
+        transform: translateY(-150%);
+        opacity: 0;
+        pointer-events: none;
+        position: fixed;
+        visibility: hidden;
+    }
+    
+    .bg-white.sticky {
+        transition: all 0.3s ease-in-out;
+    }
+    
+    .filter-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) !important;
+        width: 90%;
+        max-width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 100;
+        border-radius: 1rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+    
+    /* When filter popup is active, add overlay */
+    .filter-popup::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+    }
+    
+    /* Ensure the filter toggle button is visible */
+    #filter-toggle {
+        display: flex;
+        z-index: 101;
+    }
+}
+
+/* Update these styles for the filter container and toggle button */
+
+/* Mobile-specific styles */
+@media (max-width: 767px) {
+    /* Filter container positioning */
+    .bg-white.sticky {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: 0.5rem;
+        z-index: 50;
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border-radius: 0.75rem;
+    }
+    
+    /* Hidden state */
+    .filters-hidden {
+        transform: translateY(-150%);
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    /* Filter toggle button */
+    #filter-toggle {
+        display: flex;
+        z-index: 51;
+        transition: all 0.3s ease;
+    }
+    
+    #filter-toggle:hover, #filter-toggle:focus {
+        transform: scale(1.1);
+        background-color: #b91c1c;
+    }
+}
+
+/* Always hide the button on desktop */
+@media (min-width: 768px) {
+    #filter-toggle {
+        display: none;
+    }
+}
