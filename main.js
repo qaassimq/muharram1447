@@ -1,5 +1,3 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
     const cityFilter = document.getElementById('city-filter');
     const readerFilter = document.getElementById('reader-filter');
@@ -37,6 +35,50 @@ document.addEventListener('DOMContentLoaded', () => {
         // No need to add popup styling, just show/hide the existing filters
     });
 
+    // URL Management Functions
+    const updateURL = (filters) => {
+        const url = new URL(window.location);
+        const params = new URLSearchParams();
+        
+        // Add non-empty filters to URL
+        if (filters.city) params.set('city', filters.city);
+        if (filters.reader) params.set('reader', filters.reader);
+        if (filters.matam) params.set('matam', filters.matam);
+        if (filters.time) params.set('time', filters.time);
+        
+        // Update URL without page reload
+        const newUrl = params.toString() ? `${url.pathname}?${params.toString()}` : url.pathname;
+        window.history.pushState({}, '', newUrl);
+    };
+
+    const getFiltersFromURL = () => {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            city: params.get('city') || '',
+            reader: params.get('reader') || '',
+            matam: params.get('matam') || '',
+            time: params.get('time') || ''
+        };
+    };
+
+    const applyFiltersFromURL = () => {
+        const filters = getFiltersFromURL();
+        
+        // Set filter values without triggering events
+        cityFilter.value = filters.city;
+        readerFilter.value = filters.reader;
+        matamFilter.value = filters.matam;
+        timeFilter.value = filters.time;
+        
+        // Apply the filters
+        applyFiltersInternal();
+    };
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', () => {
+        applyFiltersFromURL();
+    });
+
     // Performance optimization - Create document fragment for batch DOM updates
     const createCardFragment = (data) => {
         const fragment = document.createDocumentFragment();
@@ -52,9 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             card.innerHTML = `
                 <div class="p-5 flex-grow">
-                    <p class="text-sm text-red-600 font-semibold mb-1">${item.city}</p>
+                    <p class="text-xl text-red-600 font-semibold mb-1">🏘️ ${item.city}</p>
                     <div class="flex items-center justify-between">
-                        <h3 class="font-bold text-xl text-gray-900 mb-3">${item.matam}</h3>
+                        <h3 class="font-bold text-xl text-gray-300 mb-3">🕌 ${item.matam}</h3>
                         <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100" onclick="filterByMatam('${item.matam}')" title="فلترة حسب هذا المأتم">
                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -65,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="flex items-center justify-between">
                             <p class="flex items-center flex-grow">
                                 <svg class="w-5 h-5 ml-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 119 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                                <span class="font-semibold">القارئ:</span>&nbsp;<span>${item.reader}</span>
+                                <span class="font-semibold text-xl">القارئ:</span>&nbsp;<span>${item.reader}</span>
                             </p>
                             <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100" onclick="filterByReader('${item.reader}')" title="فلترة حسب هذا القارئ">
                                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </svg>
                             </button>
                         </div>
-                        <p class="flex items-center">
+                        <p class="flex items-center text-xl">
                              <svg class="w-5 h-5 ml-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
                             <span class="font-semibold">الوقت:</span>&nbsp;<span>${item.time}</span>
                         </p>
@@ -157,7 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const applyFilters = debounce(() => {
+    // Internal function to apply filters without updating URL
+    const applyFiltersInternal = () => {
         const city = cityFilter.value;
         const reader = readerFilter.value.toLowerCase();
         const matam = matamFilter.value.toLowerCase();
@@ -176,6 +219,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth < 768) {
             filterContainer.classList.add('filters-hidden');
         }
+    };
+
+    // Main function to apply filters and update URL
+    const applyFilters = debounce(() => {
+        const filters = {
+            city: cityFilter.value,
+            reader: readerFilter.value,
+            matam: matamFilter.value,
+            time: timeFilter.value
+        };
+
+        // Update URL with current filters
+        updateURL(filters);
+        
+        // Apply the filters
+        applyFiltersInternal();
     }, 200); // 200ms debounce for smoother filtering
 
     // Global functions to filter by reader or matam
@@ -206,7 +265,11 @@ document.addEventListener('DOMContentLoaded', () => {
         readerFilter.value = '';
         matamFilter.value = '';
         timeFilter.value = '';
-        applyFilters();
+        
+        // Clear URL parameters
+        window.history.pushState({}, '', window.location.pathname);
+        
+        applyFiltersInternal();
     };
 
     // Setup filter event listeners based on device type
@@ -256,9 +319,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Remove the duplicate DOMContentLoaded event listener
-    // and keep only the scroll handling code
-    
     // Variables for scroll detection
     let lastScrollTop = 0;
     const scrollThreshold = 50;
@@ -302,5 +362,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize the page
     populateCityFilter();
-    renderResults(majalisData);
+    
+    // Check if there are URL parameters on page load
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.toString()) {
+        // Apply filters from URL
+        applyFiltersFromURL();
+    } else {
+        // No URL filters, show all results
+        renderResults(majalisData);
+    }
 });
