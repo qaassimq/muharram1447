@@ -1,0 +1,111 @@
+body {
+    font-family: 'Tajawal', sans-serif;
+    background-color: #f7fafc;
+}
+
+/* Custom scrollbar for better aesthetics */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #edf2f7;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #a0aec0;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #718096;
+}
+
+/* Style for the select arrow to ensure visibility */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3csvg%3e");
+    background-position: left 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-left: 2.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.card-enter {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animation for filters appearing */
+.filters-appear {
+    animation: slideDownFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes slideDownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Class to hide filters on scroll down */
+/* Update the existing filters-hidden class for better animation */
+.filters-hidden {
+    transform: translateY(-150%);
+    /* Move it up and out of view */
+}
+
+/* Add transition for smooth hiding/showing */
+.bg-white.sticky {
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Add styles for the filter toggle button */
+#filter-toggle {
+    transition: all 0.3s ease;
+}
+
+#filter-toggle:hover {
+    transform: scale(1.1);
+    background-color: #b91c1c;
+}
+
+/* Add media query for mobile-specific behavior */
+@media (max-width: 767px) {
+    .filters-appear {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: 0.5rem;
+        z-index: 50;
+    }
+}
+
+/* Filter icon hover effect */
+.filter-icon {
+    transition: all 0.2s ease;
+}
+
+.filter-icon:hover {
+    transform: scale(1.1);
+    color: #dc2626;
+}
