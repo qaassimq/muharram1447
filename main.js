@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const noResults = document.getElementById('no-results');
     const resultsCount = document.getElementById('results-count');
     const clearFiltersButton = document.getElementById('clear-filters');
+    const applyFiltersButton = document.getElementById('apply-filters');
     const filterContainer = document.querySelector('.bg-white.sticky');
     
     // Add floating filter button to the DOM
@@ -174,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hide filters after applying on mobile
         if (window.innerWidth < 768) {
             filterContainer.classList.add('filters-hidden');
-            filterContainer.classList.remove('filter-popup');
         }
     }, 200); // 200ms debounce for smoother filtering
 
@@ -209,18 +209,50 @@ document.addEventListener('DOMContentLoaded', () => {
         applyFilters();
     };
 
-    // Add event listeners
-    cityFilter.addEventListener('change', applyFilters);
-    readerFilter.addEventListener('input', applyFilters);
-    matamFilter.addEventListener('input', applyFilters);
-    timeFilter.addEventListener('change', applyFilters);
+    // Setup filter event listeners based on device type
+    function setupFilterEventListeners() {
+        // Remove existing event listeners
+        cityFilter.removeEventListener('change', applyFilters);
+        readerFilter.removeEventListener('input', applyFilters);
+        matamFilter.removeEventListener('input', applyFilters);
+        timeFilter.removeEventListener('change', applyFilters);
+        
+        // For desktop: apply filters immediately
+        if (window.innerWidth >= 768) {
+            cityFilter.addEventListener('change', applyFilters);
+            readerFilter.addEventListener('input', applyFilters);
+            matamFilter.addEventListener('input', applyFilters);
+            timeFilter.addEventListener('change', applyFilters);
+        }
+        // For mobile: don't add any event listeners that apply filters
+        // Filters will only be applied when the Apply button is clicked
+    }
+    
+    // Initial setup of event listeners
+    setupFilterEventListeners();
+    
+    // Update event listeners when window is resized
+    window.addEventListener('resize', () => {
+        setupFilterEventListeners();
+        
+        if (window.innerWidth >= 768) {
+            filterContainer.classList.remove('filters-hidden');
+        } else {
+            filterContainer.classList.add('filters-hidden');
+        }
+    });
+    
+    // Apply filters button event listener
+    applyFiltersButton.addEventListener('click', () => {
+        applyFilters();
+    });
+
     clearFiltersButton.addEventListener('click', () => {
         clearFilters();
         
         // Hide filters after clearing on mobile
         if (window.innerWidth < 768) {
             filterContainer.classList.add('filters-hidden');
-            filterContainer.classList.remove('filter-popup');
         }
     });
 
