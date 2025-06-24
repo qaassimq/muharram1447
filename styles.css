@@ -67,10 +67,8 @@ select {
 }
 
 /* Class to hide filters on scroll down */
-/* Update the existing filters-hidden class for better animation */
 .filters-hidden {
     transform: translateY(-150%);
-    /* Move it up and out of view */
 }
 
 /* Add transition for smooth hiding/showing */
@@ -88,6 +86,32 @@ select {
     background-color: #b91c1c;
 }
 
+/* Mobile filter toggle in header */
+#mobile-filter-toggle {
+    transition: all 0.3s ease;
+}
+
+#mobile-filter-toggle:hover {
+    transform: scale(1.05);
+}
+
+/* Filter indicator pulse animation */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 /* Add media query for mobile-specific behavior */
 @media (max-width: 767px) {
     .filters-appear {
@@ -97,6 +121,11 @@ select {
         right: 0;
         margin: 0.5rem;
         z-index: 50;
+    }
+
+    /* Adjust header padding for mobile filter icon */
+    header {
+        padding-top: 1rem;
     }
 }
 
@@ -110,80 +139,42 @@ select {
     color: #dc2626;
 }
 
-
-/* Add these styles at the end of your styles.css file */
-
 /* Dark mode styles */
 .dark body {
-    background-color: #1f2937; /* gray-900 */
-    color: #e5e7eb; /* gray-200 */
+    background-color: #1f2937;
+    color: #e5e7eb;
 }
 
 .dark ::-webkit-scrollbar-track {
-    background: #374151; /* gray-700 */
+    background: #374151;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-    background: #6b7280; /* gray-500 */
+    background: #6b7280;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-    background: #4b5563; /* gray-600 */
+    background: #4b5563;
 }
 
 /* Update select arrow color for dark mode */
 .dark select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3csvg%3e"); /* gray-400 */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3csvg%3e");
 }
 
 /* Dark mode for custom apply filter button */
 .dark .apply-filter-btn {
-    background-color: #dc2626; /* red-600 */
+    background-color: #dc2626;
     color: white;
 }
 
 .dark .apply-filter-btn:hover {
-    background-color: #b91c1c; /* red-700 */
+    background-color: #b91c1c;
 }
-
-/* Dark mode for card elements not fully covered by Tailwind in HTML */
-.dark .bg-white.rounded-xl.shadow-md {
-    background-color: #374151; /* gray-800 */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2); /* Darker shadow */
-}
-
-.dark .bg-gray-50.px-5.py-3 {
-    background-color: #374151; /* gray-800 */
-    border-top-color: #4b5563; /* gray-600 */
-}
-
-.dark .filter-icon {
-    color: #9ca3af; /* gray-400 */
-}
-
-.dark .filter-icon:hover {
-    color: #f87171; /* red-400 */
-}
-
-/* Ensure filter container transition works in dark mode */
-.dark .bg-white.sticky {
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-}
-
-/* Dark mode for the filter popup overlay */
-.dark .filter-popup::before {
-    background: rgba(0, 0, 0, 0.7); /* Darker overlay */
-}
-
-/* Ensure filters section has dark background in dark mode */
-.dark .filters-appear {
-    background-color: #374151 !important; /* gray-800 */
-}
-
-/* Update these styles for the filter container and toggle button */
 
 /* Mobile-specific styles */
 @media (max-width: 767px) {
+
     /* Filter container positioning */
     .bg-white.sticky {
         position: fixed;
@@ -196,30 +187,35 @@ select {
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         border-radius: 0.75rem;
     }
-    
+
     /* Hidden state */
     .filters-hidden {
         transform: translateY(-150%);
         opacity: 0;
         pointer-events: none;
     }
-    
+
     /* Filter toggle button */
     #filter-toggle {
         display: flex;
         z-index: 51;
         transition: all 0.3s ease;
     }
-    
-    #filter-toggle:hover, #filter-toggle:focus {
+
+    #filter-toggle:hover,
+    #filter-toggle:focus {
         transform: scale(1.1);
         background-color: #b91c1c;
     }
 }
 
-/* Always hide the button on desktop */
+/* Always hide the bottom button on desktop */
 @media (min-width: 768px) {
     #filter-toggle {
+        display: none;
+    }
+
+    #mobile-filter-toggle {
         display: none;
     }
 }
@@ -237,20 +233,4 @@ select {
 
 .apply-filter-btn:hover {
     background-color: #b91c1c;
-}
-
-/* Add this to your existing styles.css file */
-
-/* Pulse animation for the apply filter button */
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.7;
-    }
-}
-
-.animate-pulse {
-    animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Utility to load SVG from file and inject into element
+    function loadSVG(element, svgPath, classList = '') {
+        if (!element) return;
+        fetch(svgPath)
+            .then(res => res.text())
+            .then(svg => {
+                element.innerHTML = svg;
+                if (classList) {
+                    // Apply classes to the SVG root element
+                    const svgEl = element.querySelector('svg');
+                    if (svgEl) svgEl.setAttribute('class', classList);
+                }
+            });
+    }
+
+    // Load all static SVGs in the DOM (header, filter button, no-results)
+    function loadStaticSVGs() {
+        // Header filter icon
+        loadSVG(document.querySelector('.svg-filter-toggle'), 'svg/filter-toggle.svg', 'h-6 w-6');
+        // Bottom left filter button
+        const filterToggleBtn = document.getElementById('filter-toggle');
+        if (filterToggleBtn) {
+            loadSVG(filterToggleBtn.querySelector('.svg-filter-toggle'), 'svg/filter-toggle.svg', 'h-6 w-6');
+        }
+        // No results icon
+        loadSVG(document.querySelector('.svg-no-results'), 'svg/no-results.svg', 'mx-auto h-12 w-12 text-gray-400 dark:text-gray-500');
+    }
+
     const cityFilter = document.getElementById('city-filter');
     const readerFilter = document.getElementById('reader-filter');
     const matamFilter = document.getElementById('matam-filter');
@@ -14,13 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterButton = document.createElement('button');
     filterButton.id = 'filter-toggle';
     filterButton.className = 'fixed bottom-4 left-4 z-20 bg-red-700 text-white p-3 rounded-full shadow-lg md:hidden';
-    filterButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-    `;
+    // Placeholder for SVG
+    filterButton.innerHTML = `<span class="svg-filter-toggle"></span>`;
     document.body.appendChild(filterButton);
-    
+    // Load SVG for filter button
+    loadSVG(filterButton.querySelector('.svg-filter-toggle'), 'svg/filter-toggle.svg');
+
     // Force hide filters on mobile immediately
     if (window.innerWidth < 768) {
         // Add a small delay to ensure the class is applied after the DOM is fully loaded
@@ -98,25 +125,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="flex items-center justify-between">
                         <h3 class="font-bold text-xl text-gray-300 mb-3">🕌 ${item.matam}</h3>
                         <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100" onclick="filterByMatam('${item.matam}')" title="فلترة حسب هذا المأتم">
-                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                            </svg>
+                            <span class="svg-filter-matam"></span>
                         </button>
                     </div>
                     <div class="space-y-3 text-gray-300">
                         <div class="flex items-center justify-between">
                             <p class="flex items-center flex-grow">
-                                <svg class="w-5 h-5 ml-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 119 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                                <span class="svg-person w-5 h-5 ml-2 text-gray-400"></span>
                                 <span class="font-semibold text-xl">القارئ:</span>&nbsp;<span>${item.reader}</span>
                             </p>
                             <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100" onclick="filterByReader('${item.reader}')" title="فلترة حسب هذا القارئ">
-                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                                </svg>
+                                <span class="svg-filter-reader"></span>
                             </button>
                         </div>
                         <p class="flex items-center text-xl">
-                             <svg class="w-5 h-5 ml-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
+                             <span class="svg-clock w-5 h-5 ml-2 text-gray-400"></span>
                             <span class="font-semibold">الوقت:</span>&nbsp;<span>${item.time}</span>
                         </p>
                     </div>
@@ -124,15 +147,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="bg-gray-50 px-5 py-3 border-t border-gray-100 flex items-center justify-end space-x-2 space-x-reverse">
                     ${item.instagram ? `
                     <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center px-3 py-1 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-md hover:opacity-90 transition-opacity text-sm">
-                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.282.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.231 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.275-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.884a1.161 1.161 0 1 0 0 2.322 1.161 1.161 0 0 0 0-2.322zM8 4.882a3.118 3.118 0 1 0 0 6.236 3.118 3.118 0 0 0 0-6.236zM8 9.24a1.24 1.24 0 1 1 0-2.48 1.24 1.24 0 0 1 0 2.48z"/></svg>
+                        <span class="svg-instagram w-4 h-4"></span>
                     </a>
                     ` : ''}
                     <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm">
-                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                        <span class="svg-location w-4 h-4"></span>
                     </a>
                 </div>
             `;
             fragment.appendChild(card);
+
+            // After card is in DOM, load SVGs
+            setTimeout(() => {
+                loadSVG(card.querySelector('.svg-filter-matam'), 'svg/filter-matam.svg', 'w-5 h-5 text-gray-500');
+                loadSVG(card.querySelector('.svg-person'), 'svg/person.svg', 'w-5 h-5 ml-2 text-gray-400');
+                loadSVG(card.querySelector('.svg-filter-reader'), 'svg/filter-reader.svg', 'w-5 h-5 text-gray-500');
+                loadSVG(card.querySelector('.svg-clock'), 'svg/clock.svg', 'w-5 h-5 ml-2 text-gray-400');
+                if (item.instagram) loadSVG(card.querySelector('.svg-instagram'), 'svg/instagram.svg', 'w-4 h-4');
+                loadSVG(card.querySelector('.svg-location'), 'svg/location.svg', 'w-4 h-4');
+            }, 0);
         });
         
         return fragment;
@@ -372,4 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // No URL filters, show all results
         renderResults(majalisData);
     }
+
+    // At the end of DOMContentLoaded, load static SVGs
+    loadStaticSVGs();
 });
