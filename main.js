@@ -54,14 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="p-5 flex-grow">
                     <p class="text-sm text-red-600 font-semibold mb-1">${item.city}</p>
                     <div class="flex items-center justify-between">
-                        <h3 class="font-bold text-xl text-gray-800 mb-3">${item.matam}</h3>
+                        <h3 class="font-bold text-xl text-gray-900 mb-3">${item.matam}</h3>
                         <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100" onclick="filterByMatam('${item.matam}')" title="فلترة حسب هذا المأتم">
                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                             </svg>
                         </button>
                     </div>
-                    <div class="space-y-3 text-gray-600">
+                    <div class="space-y-3 text-gray-300">
                         <div class="flex items-center justify-between">
                             <p class="flex items-center flex-grow">
                                 <svg class="w-5 h-5 ml-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 119 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
