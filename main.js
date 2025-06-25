@@ -1,6 +1,47 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
+    const svgCache = new Map();
+
+    // Utility to load SVG from file and inject into element
+    function loadSVG(element, svgPath, classList = '') {
+        if (!element) return;
+
+        const applySvgToElement = (svgText) => {
+            element.innerHTML = svgText;
+            if (classList) {
+                const svgEl = element.querySelector('svg');
+                if (svgEl) svgEl.setAttribute('class', classList);
+            }
+        };
+
+        if (svgCache.has(svgPath)) {
+            applySvgToElement(svgCache.get(svgPath));
+            return;
+        }
+
+        fetch(svgPath)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch SVG: ${res.statusText}`);
+                }
+                return res.text();
+            })
+            .then(svg => {
+                svgCache.set(svgPath, svg);
+                applySvgToElement(svg);
+            })
+            .catch(error => console.error(`Error loading SVG from ${svgPath}:`, error));
+    }
+
+    // Load all static SVGs in the DOM (header, filter button, no-results)
+    function loadStaticSVGs() {
+        loadSVG(document.querySelector('.svg-filter-toggle'), 'svg/filter-toggle.svg', 'h-6 w-6');
+        const filterToggleBtn = document.getElementById('filter-toggle');
+        if (filterToggleBtn) {
+            loadSVG(filterToggleBtn.querySelector('.svg-filter-toggle'), 'svg/filter-toggle.svg', 'h-6 w-6');
+        }
+        loadSVG(document.querySelector('.svg-no-results'), 'svg/no-results.svg', 'mx-auto h-12 w-12 text-gray-400 dark:text-gray-500');
+    }
+
     const cityFilter = document.getElementById('city-filter');
     const readerFilter = document.getElementById('reader-filter');
     const matamFilter = document.getElementById('matam-filter');
@@ -11,18 +52,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearFiltersButton = document.getElementById('clear-filters');
     const applyFiltersButton = document.getElementById('apply-filters');
     const filterContainer = document.querySelector('.bg-white.sticky');
-    
+    const currentTimeFilter = document.getElementById('current-time-filter');
+    const themeToggle = document.getElementById('theme-toggle'); 220
+    const sortFilter = document.getElementById('sort-filter');
+
     // Add floating filter button to the DOM
     const filterButton = document.createElement('button');
     filterButton.id = 'filter-toggle';
     filterButton.className = 'fixed bottom-4 left-4 z-20 bg-red-700 text-white p-3 rounded-full shadow-lg md:hidden';
-    filterButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-    `;
+    // Placeholder for SVG
+    filterButton.innerHTML = `<span class="svg-filter-toggle"></span>`;
     document.body.appendChild(filterButton);
-    
+    // Load SVG for filter button
+    loadSVG(filterButton.querySelector('.svg-filter-toggle'), 'svg/filter-toggle.svg');
+
     // Force hide filters on mobile immediately
     if (window.innerWidth < 768) {
         // Add a small delay to ensure the class is applied after the DOM is fully loaded
@@ -30,84 +73,184 @@ document.addEventListener('DOMContentLoaded', () => {
             filterContainer.classList.add('filters-hidden');
         }, 0);
     }
-    
+
     // Toggle filters visibility when button is clicked
     filterButton.addEventListener('click', () => {
         filterContainer.classList.toggle('filters-hidden');
         // No need to add popup styling, just show/hide the existing filters
     });
 
+    // URL Management Functions
+    const updateURL = (filters) => {
+        const url = new URL(window.location);
+        const params = new URLSearchParams();
+
+        if (filters.city) params.set('city', filters.city);
+        if (filters.reader) params.set('reader', filters.reader);
+        if (filters.matam) params.set('matam', filters.matam);
+        if (filters.time) params.set('time', filters.time);
+        if (filters.currentTime) params.set('currentTime', filters.currentTime);
+        if (filters.sort) params.set('sort', filters.sort);
+
+
+        const newUrl = params.toString() ? `${url.pathname}?${params.toString()}` : url.pathname;
+        window.history.pushState({}, '', newUrl);
+    };
+
+    const getFiltersFromURL = () => {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            city: params.get('city') || '',
+            reader: params.get('reader') || '',
+            matam: params.get('matam') || '',
+            time: params.get('time') || '',
+            currentTime: params.get('currentTime') || '',
+            sort: params.get('sort') || ''
+        };
+    };
+
+    const applyFiltersFromURL = () => {
+        const filters = getFiltersFromURL();
+
+        cityFilter.value = filters.city;
+        readerFilter.value = filters.reader;
+        matamFilter.value = filters.matam;
+        timeFilter.value = filters.time;
+        currentTimeFilter.value = filters.currentTime;
+        sortFilter.value = filters.sort;
+
+
+        applyFiltersInternal();
+    };
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', () => {
+        applyFiltersFromURL();
+    });
+
     // Performance optimization - Create document fragment for batch DOM updates
     const createCardFragment = (data) => {
         const fragment = document.createDocumentFragment();
-        
-        data.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col card-enter relative';
-            card.style.animationDelay = `${Math.min(index * 30, 300)}ms`; // Cap delay for better UX
 
-            const locationQuery = encodeURIComponent(`${item.matam}, ${item.city}, Bahrain`);
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${locationQuery}`;
-            const instagramUrl = item.instagram || `https://www.instagram.com/yowahedona`;
+        // Pre-load all SVGs needed for cards
+        const svgPromises = [
+            'svg/filter-matam.svg',
+            'svg/person.svg',
+            'svg/filter-reader.svg',
+            'svg/clock.svg',
+            'svg/instagram.svg',
+            'svg/location.svg'
+        ].map(path => {
+            if (!svgCache.has(path)) {
+                return fetch(path)
+                    .then(res => res.text())
+                    .then(svg => svgCache.set(path, svg))
+                    .catch(error => console.error(`Error loading SVG from ${path}:`, error));
+            }
+            return Promise.resolve();
+        });
 
-            card.innerHTML = `
+        Promise.all(svgPromises).then(() => {
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col card-enter relative';
+                card.style.animationDelay = `${Math.min(index * 30, 300)}ms`;
+
+                const locationQuery = encodeURIComponent(`${item.matam}, ${item.city}, Bahrain`);
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${locationQuery}`;
+                const instagramUrl = item.instagram || `https://www.instagram.com/yowahedona`;
+
+                // Get SVGs from cache
+                const filterMatamSvg = svgCache.get('svg/filter-matam.svg') || '';
+                const personSvg = svgCache.get('svg/person.svg') || '';
+                const filterReaderSvg = svgCache.get('svg/filter-reader.svg') || '';
+                const clockSvg = svgCache.get('svg/clock.svg') || '';
+                const instagramSvg = svgCache.get('svg/instagram.svg') || '';
+                const locationSvg = svgCache.get('svg/location.svg') || '';
+
+                card.innerHTML = `
                 <div class="p-5 flex-grow">
-                    <p class="text-sm text-red-600 font-semibold mb-1">${item.city}</p>
+                    <p class="text-xl text-red-600 font-semibold mb-1">🏘️ ${item.city}</p>
                     <div class="flex items-center justify-between">
-                        <h3 class="font-bold text-xl text-gray-900 mb-3">${item.matam}</h3>
-                        <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100" onclick="filterByMatam('${item.matam}')" title="فلترة حسب هذا المأتم">
-                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                            </svg>
+                        <h3 class="font-bold text-xl text-gray-800 dark:text-gray-200 mb-3">🕌 ${item.matam}</h3>
+                        <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" onclick="filterByMatam('${item.matam}')" title="فلترة حسب هذا المأتم">
+                            ${filterMatamSvg}
                         </button>
                     </div>
-                    <div class="space-y-3 text-gray-300">
+                    <div class="space-y-3 text-gray-800 dark:text-gray-200">
                         <div class="flex items-center justify-between">
                             <p class="flex items-center flex-grow">
-                                <svg class="w-5 h-5 ml-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 119 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                                <span class="font-semibold">القارئ:</span>&nbsp;<span>${item.reader}</span>
+                                ${personSvg}
+                                <span class="font-semibold text-xl">القارئ:</span>&nbsp;<span>${item.reader}</span>
                             </p>
-                            <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100" onclick="filterByReader('${item.reader}')" title="فلترة حسب هذا القارئ">
-                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                                </svg>
+                            <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" onclick="filterByReader('${item.reader}')" title="فلترة حسب هذا القارئ">
+                                ${filterReaderSvg}
                             </button>
                         </div>
-                        <p class="flex items-center">
-                             <svg class="w-5 h-5 ml-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
+                        <p class="flex items-center text-xl">
+                            ${clockSvg}
                             <span class="font-semibold">الوقت:</span>&nbsp;<span>${item.time}</span>
                         </p>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-5 py-3 border-t border-gray-100 flex items-center justify-end space-x-2 space-x-reverse">
+                <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3 border-t border-gray-100 dark:border-gray-600 flex items-center justify-end space-x-2 space-x-reverse">
                     ${item.instagram ? `
                     <a href="${instagramUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center px-3 py-1 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-md hover:opacity-90 transition-opacity text-sm">
-                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.282.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.231 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.275-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.884a1.161 1.161 0 1 0 0 2.322 1.161 1.161 0 0 0 0-2.322zM8 4.882a3.118 3.118 0 1 0 0 6.236 3.118 3.118 0 0 0 0-6.236zM8 9.24a1.24 1.24 0 1 1 0-2.48 1.24 1.24 0 0 1 0 2.48z"/></svg>
+                        ${instagramSvg}
                     </a>
                     ` : ''}
                     <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm">
-                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                        ${locationSvg}
                     </a>
                 </div>
             `;
-            fragment.appendChild(card);
+                fragment.appendChild(card);
+            });
+
+            if (resultsGrid) {
+                resultsGrid.innerHTML = '';
+                resultsGrid.appendChild(fragment);
+            }
         });
-        
+
         return fragment;
     };
+    const sortByTime = (data, sortType) => {
+        if (!sortType) return data;
 
+        return [...data].sort((a, b) => {
+            const timeA = parseTimeString(a.time);
+            const timeB = parseTimeString(b.time);
+
+            // Handle cases where time parsing fails
+            if (!timeA && !timeB) return 0;
+            if (!timeA) return 1;
+            if (!timeB) return -1;
+
+            const minutesA = timeA.hours * 60 + timeA.minutes;
+            const minutesB = timeB.hours * 60 + timeB.minutes;
+
+            if (sortType === 'time-asc') {
+                return minutesA - minutesB;
+            } else if (sortType === 'time-desc') {
+                return minutesB - minutesA;
+            }
+
+            return 0;
+        });
+    };
     // Populate city filter dropdown - only do this once
     const populateCityFilter = () => {
         const cities = [...new Set(majalisData.map(item => item.city))].sort();
         const cityFragment = document.createDocumentFragment();
-        
+
         cities.forEach(city => {
             const option = document.createElement('option');
             option.value = city;
             option.textContent = city;
             cityFragment.appendChild(option);
         });
-        
+
         cityFilter.appendChild(cityFragment);
     };
 
@@ -115,11 +258,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeCategories = new Map();
     const getTimeCategory = (timeString) => {
         if (!timeString) return '';
-        
+
         if (timeCategories.has(timeString)) {
             return timeCategories.get(timeString);
         }
-        
+
         let category = '';
         if (timeString.includes('صباحًا') || timeString.includes('صباحاً')) {
             category = 'صباحا';
@@ -130,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (timeString.includes('مساءً') || timeString.includes('مساءا') || timeString.includes('العشاءين')) {
             category = 'مساءا';
         }
-        
+
         timeCategories.set(timeString, category);
         return category;
     };
@@ -138,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Debounce function for search inputs
     const debounce = (func, delay) => {
         let timeoutId;
-        return function(...args) {
+        return function (...args) {
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 func.apply(this, args);
@@ -150,33 +293,54 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsGrid.innerHTML = '';
         resultsCount.textContent = `عرض ${data.length} من ${majalisData.length} مجلس`;
         noResults.classList.toggle('hidden', data.length > 0);
-        
+
         if (data.length > 0) {
             const fragment = createCardFragment(data);
             resultsGrid.appendChild(fragment);
         }
     };
 
-    const applyFilters = debounce(() => {
+    // Internal function to apply filters without updating URL
+    const applyFiltersInternal = () => {
         const city = cityFilter.value;
         const reader = readerFilter.value.toLowerCase();
         const matam = matamFilter.value.toLowerCase();
         const time = timeFilter.value;
+        const currentTime = currentTimeFilter.value;
+        const sort = sortFilter.value;
 
-        const filteredData = majalisData.filter(item =>
-            (!city || item.city === city) &&
-            (!reader || item.reader.toLowerCase().includes(reader)) &&
-            (!matam || item.matam.toLowerCase().includes(matam)) &&
-            (!time || getTimeCategory(item.time) === time)
-        );
+        const filteredData = majalisData.filter(item => {
+            const cityMatch = !city || item.city === city;
+            const readerMatch = !reader || item.reader.toLowerCase().includes(reader);
+            const matamMatch = !matam || item.matam.toLowerCase().includes(matam);
+            const timeMatch = !time || getTimeCategory(item.time) === time;
+            const currentTimeMatch = !currentTime || currentTime !== 'upcoming' || isUpcoming(item.time);
+
+            return cityMatch && readerMatch && matamMatch && timeMatch && currentTimeMatch;
+        });
 
         renderResults(filteredData);
-        
+
         // Hide filters after applying on mobile
         if (window.innerWidth < 768) {
             filterContainer.classList.add('filters-hidden');
         }
-    }, 200); // 200ms debounce for smoother filtering
+    };
+
+    // Main function to apply filters and update URL
+    const applyFilters = debounce(() => {
+        const filters = {
+            city: cityFilter.value,
+            reader: readerFilter.value,
+            matam: matamFilter.value,
+            time: timeFilter.value,
+            currentTime: currentTimeFilter.value,
+            sort: sortFilter.value
+        };
+
+        updateURL(filters);
+        applyFiltersInternal();
+    }, 200);// 200ms debounce for smoother filtering
 
     // Global functions to filter by reader or matam
     window.filterByReader = (readerName) => {
@@ -185,18 +349,18 @@ document.addEventListener('DOMContentLoaded', () => {
         matamFilter.value = '';
         timeFilter.value = '';
         applyFilters();
-        
+
         // Scroll to results
         resultsCount.scrollIntoView({ behavior: 'smooth' });
     };
-    
+
     window.filterByMatam = (matamName) => {
         cityFilter.value = '';
         readerFilter.value = '';
         matamFilter.value = matamName;
         timeFilter.value = '';
         applyFilters();
-        
+
         // Scroll to results
         resultsCount.scrollIntoView({ behavior: 'smooth' });
     };
@@ -206,7 +370,11 @@ document.addEventListener('DOMContentLoaded', () => {
         readerFilter.value = '';
         matamFilter.value = '';
         timeFilter.value = '';
-        applyFilters();
+        currentTimeFilter.value = '';
+        sortFilter.value = '';
+
+        window.history.pushState({}, '', window.location.pathname);
+        applyFiltersInternal();
     };
 
     // Setup filter event listeners based on device type
@@ -216,32 +384,35 @@ document.addEventListener('DOMContentLoaded', () => {
         readerFilter.removeEventListener('input', applyFilters);
         matamFilter.removeEventListener('input', applyFilters);
         timeFilter.removeEventListener('change', applyFilters);
-        
+        currentTimeFilter.removeEventListener('change', applyFilters);
+        sortFilter.removeEventListener('change', applyFilters);
+
         // For desktop: apply filters immediately
         if (window.innerWidth >= 768) {
             cityFilter.addEventListener('change', applyFilters);
             readerFilter.addEventListener('input', applyFilters);
             matamFilter.addEventListener('input', applyFilters);
             timeFilter.addEventListener('change', applyFilters);
+            currentTimeFilter.addEventListener('change', applyFilters);
+            sortFilter.addEventListener('change', applyFilters);
         }
-        // For mobile: don't add any event listeners that apply filters
-        // Filters will only be applied when the Apply button is clicked
-    }
-    
+    };
+
+
     // Initial setup of event listeners
     setupFilterEventListeners();
-    
+
     // Update event listeners when window is resized
     window.addEventListener('resize', () => {
         setupFilterEventListeners();
-        
+
         if (window.innerWidth >= 768) {
             filterContainer.classList.remove('filters-hidden');
         } else {
             filterContainer.classList.add('filters-hidden');
         }
     });
-    
+
     // Apply filters button event listener
     applyFiltersButton.addEventListener('click', () => {
         applyFilters();
@@ -249,16 +420,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     clearFiltersButton.addEventListener('click', () => {
         clearFilters();
-        
+
         // Hide filters after clearing on mobile
         if (window.innerWidth < 768) {
             filterContainer.classList.add('filters-hidden');
         }
     });
 
-    // Remove the duplicate DOMContentLoaded event listener
-    // and keep only the scroll handling code
-    
     // Variables for scroll detection
     let lastScrollTop = 0;
     const scrollThreshold = 50;
@@ -269,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!ticking) {
             window.requestAnimationFrame(() => {
                 const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                
+
                 // Only apply filter hiding on mobile/tablet
                 if (window.innerWidth < 768) {
                     if (currentScrollTop > lastScrollTop && currentScrollTop > scrollThreshold) {
@@ -281,11 +449,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     filterContainer.classList.remove('filters-hidden');
                     filterContainer.classList.remove('filter-popup');
                 }
-                
+
                 lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
                 ticking = false;
             });
-            
+
             ticking = true;
         }
     });
@@ -302,5 +470,94 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize the page
     populateCityFilter();
-    renderResults(majalisData);
+
+    // Check if there are URL parameters on page load
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.toString()) {
+        // Apply filters from URL
+        applyFiltersFromURL();
+    } else {
+        // No URL filters, show all results
+        renderResults(majalisData);
+    }
+
+    // At the end of DOMContentLoaded, load static SVGs
+    loadStaticSVGs();
+
+    // Add theme toggle functionality
+    const initTheme = () => {
+        // Dark mode is default, but check localStorage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+        updateThemeIcon();
+    };
+
+    const toggleTheme = () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        if (isDark) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+        updateThemeIcon();
+    };
+
+    const updateThemeIcon = () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        const iconPath = isDark ? 'svg/sun.svg' : 'svg/moon.svg';
+        loadSVG(document.getElementById('theme-icon'), iconPath, 'w-5 h-5');
+    };
+
+    // Add current time filtering functionality
+    const parseTimeString = (timeString) => {
+        if (!timeString) return null;
+
+        // Extract time and period
+        const timeMatch = timeString.match(/(\d{1,2}):(\d{2})\s*(صباحًا|صباحاً|ظهراً|عصراً|عصرًا|مساءً|مساءا)/);
+        if (!timeMatch) return null;
+
+        let [, hours, minutes, period] = timeMatch;
+        hours = parseInt(hours);
+        minutes = parseInt(minutes);
+
+        // Convert to 24-hour format
+        if (period.includes('صباح')) {
+            // Morning: 6 AM - 11:59 AM
+            if (hours === 12) hours = 0;
+        } else if (period.includes('ظهراً')) {
+            // Noon: 12 PM - 2:59 PM
+            if (hours !== 12) hours += 12;
+        } else if (period.includes('عصر')) {
+            // Afternoon: 3 PM - 5:59 PM
+            hours += 12;
+        } else if (period.includes('مساء')) {
+            // Evening: 6 PM - 11:59 PM
+            if (hours !== 12) hours += 12;
+        }
+
+        return { hours, minutes };
+    };
+
+    const isUpcoming = (timeString) => {
+        const parsedTime = parseTimeString(timeString);
+        if (!parsedTime) return false;
+
+        const now = new Date();
+        const eventTime = new Date();
+        eventTime.setHours(parsedTime.hours, parsedTime.minutes, 0, 0);
+
+        return eventTime > now;
+    };
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+
+    // Initialize theme on page load - add this before loadStaticSVGs()
+    initTheme();
 });

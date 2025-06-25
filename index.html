@@ -15,14 +15,30 @@
 <body class="text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-900">
 
     <div class="container mx-auto p-4 md:p-8">
-        <!-- Header Section -->
-        <header class="text-center mb-10">
+        <!-- Header Section with Mobile Filter Icon -->
+        <header class="text-center mb-10 relative">
             <h1 class="text-4xl md:text-5xl font-bold text-red-800 dark:text-red-600">دليل عاشوراء البحرين</h1>
             <p class="text-xl text-gray-500 dark:text-gray-400 mt-2">موسم ١٤٤٧ هـ</p>
+
+            <!-- Mobile Filter Icon in Header -->
+            <button id="mobile-filter-toggle" class="md:hidden absolute top-0 left-0 bg-red-700 dark:bg-red-600 text-white p-3 rounded-lg shadow-lg hover:bg-red-800 dark:hover:bg-red-700 transition-all duration-300">
+                <div class="relative">
+                    <span class="svg-filter-toggle"></span>
+                    <!-- Filter Active Indicator -->
+                    <span id="filter-indicator" class="hidden absolute -top-2 -right-2 bg-yellow-500 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">!</span>
+                </div>
+                <span class="text-xs mt-1 block font-medium">فلتر</span>
+            </button>
+            <button id="theme-toggle" class="md:absolute md:top-0 md:right-0 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-3 rounded-lg shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 mt-4 md:mt-0">
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <span id="theme-icon" class="svg-theme-toggle"></span>
+                    <span class="text-xs font-medium">الوضع</span>
+                </div>
+            </button>
         </header>
 
         <!-- Filters Section -->
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg dark:shadow-xl mb-8 sticky top-4 z-10 filters-hidden">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg dark:shadow-xl mb-8 sticky top-4 z-10 filters-hidden" id="filters-section">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
                 <div>
                     <label for="city-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">المدينة</label>
@@ -47,28 +63,45 @@
                         <option value="صباحا">صباحاً ☀️</option>
                         <option value="ظهرا">ظهراً ☀️</option>
                         <option value="عصرا">عصراً ☀️</option>
-                        <option value="مساءa">مساءً 🌙</option>
+                        <option value="مساءا">مساءً 🌙</option>
                     </select>
                 </div>
             </div>
-            <!-- In the filters section, update the button container -->
-            <div class="mt-4 text-center flex justify-center space-x-4 space-x-reverse">
-                <button id="apply-filters" class="apply-filter-btn">تطبيق الفلتر</button>
-                <button id="clear-filters" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium">مسح الفلاتر</button>
+            <div class="hidden md:block mt-4">
+                <label for="current-time-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">الاوقات القادمة</label>
+                <select id="current-time-filter" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200">
+                    <option value="">الكل</option>
+                    <option value="upcoming">القادمة فقط ⏰</option>
+                </select>
             </div>
+            <div class="hidden md:block mt-4">
+                <label for="sort-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">ترتيب حسب الوقت</label>
+                <select id="sort-filter" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200">
+                    <option value="">بدون ترتيب</option>
+                    <option value="time-asc">الأقرب زمنياً أولاً ⏰</option>
+                    <option value="time-desc">الأبعد زمنياً أولاً ⏰</option>
+                </select>
+            </div>
+            <!-- Filter buttons section -->
+            <div class="mt-4 text-center flex justify-center space-x-4 space-x-reverse">
+                <button id="apply-filters" class="apply-filter-btn">تطبيق الفلتر ✔️</button>
+                <button id="clear-filters" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium">مسح الفلاتر 🧹</button>
+            </div>
+
+            <!-- Close button for mobile -->
+            <button id="close-filters" class="md:hidden mt-4 w-full bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors">
+                إغلاق الفلاتر ✖️
+            </button>
         </div>
 
         <!-- Results Count -->
-        <!-- Add this button right after the results-count div -->
         <div id="results-count" class="text-center text-gray-600 dark:text-gray-400 mb-6 font-semibold"></div>
-        
-        <!-- Filter Toggle Button (Mobile Only) -->
-        <button id="filter-toggle" class="fixed bottom-4 left-4 z-20 bg-red-700 dark:bg-red-600 text-white p-3 rounded-full shadow-lg md:hidden hover:bg-red-800 dark:hover:bg-red-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
+
+        <!-- Filter Toggle Button (Bottom Right - Backup) -->
+        <button title="Toggle Filters" id="filter-toggle" class="fixed bottom-4 left-4 z-20 bg-red-700 dark:bg-red-600 text-white p-3 rounded-full shadow-lg md:hidden hover:bg-red-800 dark:hover:bg-red-700">
+            <span class="svg-filter-toggle"></span>
         </button>
-        
+
         <!-- Results Section -->
         <main id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Program cards will be injected here by JavaScript -->
@@ -76,9 +109,7 @@
 
         <!-- No Results Message -->
         <div id="no-results" class="hidden text-center py-20">
-            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+            <span class="svg-no-results mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"></span>
             <p class="mt-4 text-xl text-gray-500 dark:text-gray-400">لا توجد نتائج مطابقة لبحثك.</p>
         </div>
     </div>
