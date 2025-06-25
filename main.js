@@ -90,6 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filters.matam) params.set('matam', filters.matam);
         if (filters.time) params.set('time', filters.time);
         if (filters.currentTime) params.set('currentTime', filters.currentTime);
+        if (filters.sort) params.set('sort', filters.sort);
+
 
         const newUrl = params.toString() ? `${url.pathname}?${params.toString()}` : url.pathname;
         window.history.pushState({}, '', newUrl);
@@ -102,7 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
             reader: params.get('reader') || '',
             matam: params.get('matam') || '',
             time: params.get('time') || '',
-            currentTime: params.get('currentTime') || ''
+            currentTime: params.get('currentTime') || '',
+            sort: params.get('sort') || ''
         };
     };
 
@@ -114,6 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
         matamFilter.value = filters.matam;
         timeFilter.value = filters.time;
         currentTimeFilter.value = filters.currentTime;
+        sortFilter.value = filters.sort;
+
 
         applyFiltersInternal();
     };
@@ -302,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const matam = matamFilter.value.toLowerCase();
         const time = timeFilter.value;
         const currentTime = currentTimeFilter.value;
+        const sort = sortFilter.value;
 
         const filteredData = majalisData.filter(item => {
             const cityMatch = !city || item.city === city;
@@ -328,7 +334,8 @@ document.addEventListener('DOMContentLoaded', () => {
             reader: readerFilter.value,
             matam: matamFilter.value,
             time: timeFilter.value,
-            currentTime: currentTimeFilter.value
+            currentTime: currentTimeFilter.value,
+            sort: sortFilter.value
         };
 
         updateURL(filters);
@@ -364,6 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
         matamFilter.value = '';
         timeFilter.value = '';
         currentTimeFilter.value = '';
+        sortFilter.value = '';
 
         window.history.pushState({}, '', window.location.pathname);
         applyFiltersInternal();
@@ -377,6 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         matamFilter.removeEventListener('input', applyFilters);
         timeFilter.removeEventListener('change', applyFilters);
         currentTimeFilter.removeEventListener('change', applyFilters);
+        sortFilter.removeEventListener('change', applyFilters);
 
         // For desktop: apply filters immediately
         if (window.innerWidth >= 768) {
@@ -385,6 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             matamFilter.addEventListener('input', applyFilters);
             timeFilter.addEventListener('change', applyFilters);
             currentTimeFilter.addEventListener('change', applyFilters);
+            sortFilter.addEventListener('change', applyFilters);
         }
     };
 

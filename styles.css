@@ -216,7 +216,7 @@ select {
 
 @media (min-width: 768px) {
     .filters-section .grid {
-        grid-template-columns: repeat(5, 1fr); /* Changed from 4 to 5 columns */
+        grid-template-columns: repeat(6, 1fr); /* Changed from 4 to 5 columns */
     }
 }
 
@@ -517,4 +517,8 @@ input[type="text"]:focus, select:focus {
     background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
     transform: translateY(-1px);
+}
+
+.hidden {
+    display: none !important;
 }
