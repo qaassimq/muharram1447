@@ -19,7 +19,7 @@
         <header class="text-center mb-10 relative">
             <h1 class="text-4xl md:text-5xl font-bold text-red-800 dark:text-red-600">دليل عاشوراء البحرين</h1>
             <p class="text-xl text-gray-500 dark:text-gray-400 mt-2">موسم ١٤٤٧ هـ</p>
-            
+
             <!-- Mobile Filter Icon in Header -->
             <button id="mobile-filter-toggle" class="md:hidden absolute top-0 left-0 bg-red-700 dark:bg-red-600 text-white p-3 rounded-lg shadow-lg hover:bg-red-800 dark:hover:bg-red-700 transition-all duration-300">
                 <div class="relative">
@@ -28,6 +28,12 @@
                     <span id="filter-indicator" class="hidden absolute -top-2 -right-2 bg-yellow-500 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">!</span>
                 </div>
                 <span class="text-xs mt-1 block font-medium">فلتر</span>
+            </button>
+            <button id="theme-toggle" class="md:absolute md:top-0 md:right-0 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-3 rounded-lg shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 mt-4 md:mt-0">
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <span id="theme-icon" class="svg-theme-toggle"></span>
+                    <span class="text-xs font-medium">الوضع</span>
+                </div>
             </button>
         </header>
 
@@ -61,12 +67,27 @@
                     </select>
                 </div>
             </div>
+            <div>
+                <label for="current-time-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">الاوقات القادمة</label>
+                <select id="current-time-filter" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200">
+                    <option value="">الكل</option>
+                    <option value="upcoming">القادمة فقط ⏰</option>
+                </select>
+            </div>
+            <div>
+                <label for="sort-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">ترتيب حسب الوقت</label>
+                <select id="sort-filter" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200">
+                    <option value="">بدون ترتيب</option>
+                    <option value="time-asc">الأقرب زمنياً أولاً ⏰</option>
+                    <option value="time-desc">الأبعد زمنياً أولاً ⏰</option>
+                </select>
+            </div>
             <!-- Filter buttons section -->
             <div class="mt-4 text-center flex justify-center space-x-4 space-x-reverse">
                 <button id="apply-filters" class="apply-filter-btn">تطبيق الفلتر ✔️</button>
                 <button id="clear-filters" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium">مسح الفلاتر 🧹</button>
             </div>
-            
+
             <!-- Close button for mobile -->
             <button id="close-filters" class="md:hidden mt-4 w-full bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors">
                 إغلاق الفلاتر ✖️
@@ -75,12 +96,12 @@
 
         <!-- Results Count -->
         <div id="results-count" class="text-center text-gray-600 dark:text-gray-400 mb-6 font-semibold"></div>
-        
+
         <!-- Filter Toggle Button (Bottom Right - Backup) -->
-        <button id="filter-toggle" class="fixed bottom-4 left-4 z-20 bg-red-700 dark:bg-red-600 text-white p-3 rounded-full shadow-lg md:hidden hover:bg-red-800 dark:hover:bg-red-700">
+        <button title="Toggle Filters" id="filter-toggle" class="fixed bottom-4 left-4 z-20 bg-red-700 dark:bg-red-600 text-white p-3 rounded-full shadow-lg md:hidden hover:bg-red-800 dark:hover:bg-red-700">
             <span class="svg-filter-toggle"></span>
         </button>
-        
+
         <!-- Results Section -->
         <main id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Program cards will be injected here by JavaScript -->
