@@ -590,3 +590,18 @@ document.addEventListener('DOMContentLoaded', function () {
         closeFilters.addEventListener('click', closeFiltersPanel);
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const themeSwitch = document.getElementById('theme-switch');
+    const html = document.documentElement;
+
+    if (themeSwitch) {
+        themeSwitch.addEventListener('change', function () {
+            if (themeSwitch.checked) {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+        });
+    }
+});

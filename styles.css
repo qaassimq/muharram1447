@@ -250,6 +250,28 @@ select {
     transition: all 0.3s ease;
 }
 
+/* Modern theme switch styles */
+#theme-toggle {
+    -webkit-user-select: none;
+    user-select: none;
+}
+#theme-switch:checked ~ .relative .dot {
+    transform: translateX(24px);
+    background: #fbbf24; /* yellow-400 for sun */
+}
+#theme-switch:not(:checked) ~ .relative .dot {
+    transform: translateX(0);
+    background: #fff;
+}
+#theme-toggle .relative {
+    transition: background 0.3s;
+}
+#theme-switch:checked ~ .relative .bg-gray-400 {
+    background: #334155; /* dark background for switch */
+}
+#theme-switch:not(:checked) ~ .relative .bg-gray-400 {
+    background: #fbbf24; /* yellow-400 for light */
+}
 #theme-toggle:hover {
     transform: scale(1.05);
 }
