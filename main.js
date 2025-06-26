@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 card.innerHTML = `
                 <div class="p-5 flex-grow">
-                    <p class="text-xl text-red-600 font-semibold mb-1">🏘️ ${item.city}</p>
+                    <p class="text-xl text-red-600 font-semibold mb-1"><i class="fa fa-building-o" aria-hidden="true"></i> ${item.city}</p>
                     <div class="flex items-center justify-between">
                         <h3 class="font-bold text-xl text-gray-800 dark:text-gray-200 mb-3">🕌 ${item.matam}</h3>
                         <button class="filter-icon cursor-pointer p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" onclick="filterByMatam('${item.matam}')" title="فلترة حسب هذا المأتم">
@@ -560,4 +560,98 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize theme on page load - add this before loadStaticSVGs()
     initTheme();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const filtersSection = document.getElementById('filters-section');
+    const filterToggle = document.getElementById('filter-toggle');
+    const mobileFilterToggle = document.getElementById('mobile-filter-toggle');
+    const closeFilters = document.getElementById('close-filters');
+
+    function openFilters() {
+        filtersSection.classList.remove('filters-hidden');
+        filtersSection.classList.add('filters-appear');
+    }
+
+    function closeFiltersPanel() {
+        filtersSection.classList.remove('filters-appear');
+        filtersSection.classList.add('filters-hidden');
+    }
+
+    // Open filter panel on mobile
+    if (mobileFilterToggle) {
+        mobileFilterToggle.addEventListener('click', openFilters);
+    }
+    if (filterToggle) {
+        filterToggle.addEventListener('click', openFilters);
+    }
+    // Close filter panel on mobile
+    if (closeFilters) {
+        closeFilters.addEventListener('click', closeFiltersPanel);
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const themeSwitch = document.getElementById('theme-switch');
+    const html = document.documentElement;
+
+    if (themeSwitch) {
+        themeSwitch.addEventListener('change', function () {
+            if (themeSwitch.checked) {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', async function () {
+            const url = window.location.href;
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: document.title,
+                        url: url
+                    });
+                } catch (err) {
+                    // User cancelled or error
+                }
+            } else {
+                // Fallback: copy to clipboard
+                try {
+                    await navigator.clipboard.writeText(url);
+                    shareBtn.textContent = 'تم نسخ الرابط!';
+                    setTimeout(() => {
+                        shareBtn.textContent = 'مشاركة الرابط';
+                    }, 2000);
+                } catch (err) {
+                    alert('لم يتمكن المتصفح من نسخ الرابط');
+                }
+            }
+        });
+    }
+
+    // Info modal logic
+    const infoBtn = document.getElementById('info-btn');
+    const infoModal = document.getElementById('info-modal');
+    const closeInfo = document.getElementById('close-info');
+
+    if (infoBtn && infoModal && closeInfo) {
+        infoBtn.addEventListener('click', () => {
+            infoModal.classList.remove('hidden');
+        });
+        closeInfo.addEventListener('click', () => {
+            infoModal.classList.add('hidden');
+        });
+        // Close modal when clicking outside the box
+        infoModal.addEventListener('click', (e) => {
+            if (e.target === infoModal) {
+                infoModal.classList.add('hidden');
+            }
+        });
+    }
 });
