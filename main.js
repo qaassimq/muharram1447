@@ -561,3 +561,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize theme on page load - add this before loadStaticSVGs()
     initTheme();
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const filtersSection = document.getElementById('filters-section');
+    const filterToggle = document.getElementById('filter-toggle');
+    const mobileFilterToggle = document.getElementById('mobile-filter-toggle');
+    const closeFilters = document.getElementById('close-filters');
+
+    function openFilters() {
+        filtersSection.classList.remove('filters-hidden');
+        filtersSection.classList.add('filters-appear');
+    }
+
+    function closeFiltersPanel() {
+        filtersSection.classList.remove('filters-appear');
+        filtersSection.classList.add('filters-hidden');
+    }
+
+    // Open filter panel on mobile
+    if (mobileFilterToggle) {
+        mobileFilterToggle.addEventListener('click', openFilters);
+    }
+    if (filterToggle) {
+        filterToggle.addEventListener('click', openFilters);
+    }
+    // Close filter panel on mobile
+    if (closeFilters) {
+        closeFilters.addEventListener('click', closeFiltersPanel);
+    }
+});
