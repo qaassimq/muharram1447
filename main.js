@@ -634,4 +634,24 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // Info modal logic
+    const infoBtn = document.getElementById('info-btn');
+    const infoModal = document.getElementById('info-modal');
+    const closeInfo = document.getElementById('close-info');
+
+    if (infoBtn && infoModal && closeInfo) {
+        infoBtn.addEventListener('click', () => {
+            infoModal.classList.remove('hidden');
+        });
+        closeInfo.addEventListener('click', () => {
+            infoModal.classList.add('hidden');
+        });
+        // Close modal when clicking outside the box
+        infoModal.addEventListener('click', (e) => {
+            if (e.target === infoModal) {
+                infoModal.classList.add('hidden');
+            }
+        });
+    }
 });

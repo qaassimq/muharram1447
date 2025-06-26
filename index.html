@@ -20,11 +20,15 @@
     <div class="container mx-auto p-4 md:p-8">
         <!-- Header Section with Mobile Filter Icon -->
         <header class="text-center mb-10 relative flex flex-col items-center gap-4">
-            <h1 class="text-4xl md:text-5xl font-bold text-red-800 dark:text-red-600">دليل عاشوراء البحرين</h1>
-            <p class="text-xl text-gray-500 dark:text-gray-400 mt-2">موسم ١٤٤٧ هـ</p>
-
-            <!-- Mobile Filter Icon in Header -->
-            <button id="mobile-filter-toggle" class="md:hidden absolute top-0 left-0 bg-red-700 dark:bg-red-600 text-white p-3 rounded-lg shadow-lg hover:bg-red-800 dark:hover:bg-red-700 transition-all duration-300">
+            <div class="flex row items-center justify-center gap-2">
+                <span>
+                    <!-- Info Button -->
+                    <button id="info-btn" title="عن التطبيق" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 text-blue-700 dark:text-blue-300 text-lg font-bold shadow hover:bg-gray-400 dark:hover:bg-gray-600 transition-all ">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    </button>
+                </span>
+                <h1 class="text-4xl md:text-2xl font-bold text-red-800 dark:text-red-600">دليل عاشوراء البحرين</h1>
+                 <button id="mobile-filter-toggle" class="md:hidden absolute top-0 left-0 bg-red-700 dark:bg-red-600 text-white p-3 rounded-lg shadow-lg hover:bg-red-800 dark:hover:bg-red-700 transition-all duration-300">
                 <div class="relative">
                     <span class="svg-filter-toggle"></span>
                     <!-- Filter Active Indicator -->
@@ -32,6 +36,11 @@
                 </div>
                 <span class="text-xs mt-1 block font-medium">فلتر</span>
             </button>
+            </div>
+            <p class="text-xl text-gray-500 dark:text-gray-400 mt-2">موسم ١٤٤٧ هـ</p>
+
+            <!-- Mobile Filter Icon in Header -->
+           
 
             <!-- Centered, auto-width theme toggle -->
             <div class="flex justify-center">
@@ -49,6 +58,7 @@
                     </span>
                 </label>
             </div>
+
         </header>
 
         <!-- Filters Section -->
@@ -130,6 +140,26 @@
         <!-- Share Button -->
         <button id="share-btn" title="Share Link" class="flex items-center px-3 py-2  bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors text-sm font-medium mt-2">
             <i class="fa fa-share-alt" aria-hidden="true"></i> </button>
+
+        <!-- Info Modal -->
+        <div id="info-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 max-w-md w-full relative text-right">
+                <button id="close-info" class="absolute top-2 left-2 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
+                <h2 class="text-xl font-bold mb-2 text-blue-700 dark:text-blue-300">عن التطبيق</h2>
+                <p class="mb-4 text-gray-700 dark:text-gray-200">
+                    هذا التطبيق يسهّل عليك استكشاف مجالس ومآتم عاشوراء في البحرين لموسم ١٤٤٧ هـ. يمكنك البحث والتصفية حسب المدينة، القارئ، الوقت، وترتيب النتائج بسهولة. شارك الروابط مع أصدقائك وابقَ على اطلاع على أحدث المجالس القادمة.
+                </p>
+                <ul class="mb-2 text-sm text-gray-700 dark:text-gray-200 space-y-2">
+                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🔍 البحث:</span> ابحث باسم المأتم أو القارئ.</li>
+                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🏙️ المدينة:</span> تصفية النتائج حسب المدينة.</li>
+                    <li><span class="font-bold text-blue-600 dark:text-blue-300">⏰ الوقت:</span> تصفية حسب وقت المجلس.</li>
+                    <li><span class="font-bold text-blue-600 dark:text-blue-300">✔️ تطبيق الفلتر:</span> عرض النتائج حسب الفلاتر المختارة.</li>
+                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🧹 مسح الفلاتر:</span> إعادة تعيين جميع الفلاتر.</li>
+                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🌑 الوضع الليلي:</span> تبديل بين الوضع الليلي والوضع الفاتح.</li>
+                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🔗 مشاركة:</span> مشاركة الرابط الحالي مع الفلاتر المفعلة.</li>
+                </ul>
+            </div>
+        </div>
     </div>
     <script src="data.js"></script>
     <script src="main.js"></script>
