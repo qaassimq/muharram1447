@@ -1,169 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl" class="dark">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دليل عاشوراء البحرين 1447</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-
-</head>
-
-<body class="text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-900">
-
-    <div class="container mx-auto p-4 md:p-8">
-        <!-- Header Section with Mobile Filter Icon -->
-        <header class="text-center mb-10 relative flex flex-col items-center gap-4">
-            <div class="flex row items-center justify-center gap-2">
-                <span>
-                    <!-- Info Button -->
-                    <button id="info-btn" title="عن التطبيق" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 text-blue-700 dark:text-blue-300 text-lg font-bold shadow hover:bg-gray-400 dark:hover:bg-gray-600 transition-all ">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    </button>
-                </span>
-                <h1 class="text-4xl md:text-2xl font-bold text-red-800 dark:text-red-600">دليل عاشوراء البحرين</h1>
-                 <button id="mobile-filter-toggle" class="md:hidden absolute top-0 left-0 bg-red-700 dark:bg-red-600 text-white p-3 rounded-lg shadow-lg hover:bg-red-800 dark:hover:bg-red-700 transition-all duration-300">
-                <div class="relative">
-                    <span class="svg-filter-toggle"></span>
-                    <!-- Filter Active Indicator -->
-                    <span id="filter-indicator" class="hidden absolute -top-2 -right-2 bg-yellow-500 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">!</span>
-                </div>
-                <span class="text-xs mt-1 block font-medium">فلتر</span>
-            </button>
-            </div>
-            <p class="text-xl text-gray-500 dark:text-gray-400 mt-2">موسم ١٤٤٧ هـ</p>
-
-            <!-- Mobile Filter Icon in Header -->
-           
-
-            <!-- Centered, auto-width theme toggle -->
-            <div class="flex justify-center">
-                <label id="theme-toggle" class="flex items-center gap-3 cursor-pointer bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 select-none">
-                    <span class="flex items-center justify-center mt-2 w-5 h-5">🌑
-                    </span>
-                    <input type="checkbox" id="theme-switch" class="sr-only" aria-label="تبديل الوضع الليلي" checked>
-                    <div class="relative w-12 h-6">
-                        <div class="absolute inset-0 rounded-full bg-gray-400 dark:bg-gray-600 transition-colors duration-300"></div>
-                        <div class="dot absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-md transition-transform duration-300"></div>
-                    </div>
-                    <span class="text-xs font-medium"> <svg id="sun-icon" class="block dark:hidden w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 15a5 5 0 100-10 5 5 0 000 10zm0 7a1 1 0 01-1-1v-2a1 1 0 112 0v2a1 1 0 01-1 1zm0-18a1 1 0 01-1-1V1a1 1 0 112 0v2a1 1 0 01-1 1zm9 9a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zm-16 0a1 1 0 01-1 1H1a1 1 0 110-2h2a1 1 0 011 1zm12.071 7.071a1 1 0 01-1.414 0l-1.414-1.414a1 1 0 111.414-1.414l1.414 1.414a1 1 0 010 1.414zm-10.142 0a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L4.343 17.07a1 1 0 01-1.414 0zm12.02-12.02a1 1 0 010 1.414l-1.414 1.414a1 1 0 11-1.414-1.414l1.414-1.414a1 1 0 011.414 0zm-10.02 0a1 1 0 011.414 0l1.414 1.414A1 1 0 114.343 6.93L2.93 5.515a1 1 0 010-1.414z" />
-                        </svg>
-                    </span>
-                </label>
-            </div>
-
-        </header>
-
-        <!-- Filters Section -->
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg dark:shadow-xl mb-8 sticky top-4 z-10 filters-hidden" id="filters-section">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
-                <div>
-                    <label for="city-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">المدينة</label>
-                    <select id="city-filter" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200">
-                        <option value="">الكل</option>
-                    </select>
-                </div>
-                <div class="relative">
-                    <label for="reader-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">القارئ</label>
-                    <div class="flex items-center">
-                        <input type="text" id="reader-filter" placeholder="ابحث باسم القارئ..." class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400">
-                    </div>
-                </div>
-                <div>
-                    <label for="matam-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">المأتم أو المجلس</label>
-                    <input type="text" id="matam-filter" placeholder="ابحث باسم المأتم..." class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400">
-                </div>
-                <div>
-                    <label for="time-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">الوقت</label>
-                    <select id="time-filter" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200">
-                        <option value="">الكل</option>
-                        <option value="صباحا">صباحاً ☀️</option>
-                        <option value="ظهرا">ظهراً ☀️</option>
-                        <option value="عصرا">عصراً ☀️</option>
-                        <option value="مساءا">مساءً 🌙</option>
-                    </select>
-                </div>
-            </div>
-            <div class="hidden md:block mt-4">
-                <label for="current-time-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">الاوقات القادمة</label>
-                <select id="current-time-filter" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200">
-                    <option value="">الكل</option>
-                    <option value="upcoming">القادمة فقط ⏰</option>
-                </select>
-            </div>
-            <div class="hidden md:block mt-4">
-                <label for="sort-filter" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">ترتيب حسب الوقت</label>
-                <select id="sort-filter" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-gray-800 dark:text-gray-200">
-                    <option value="">بدون ترتيب</option>
-                    <option value="time-asc">الأقرب زمنياً أولاً ⏰</option>
-                    <option value="time-desc">الأبعد زمنياً أولاً ⏰</option>
-                </select>
-            </div>
-            <!-- Filter buttons section -->
-            <div class="mt-4 text-center flex justify-center space-x-4 space-x-reverse">
-                <button id="apply-filters" class="apply-filter-btn">تطبيق الفلتر ✔️</button>
-                <button id="clear-filters" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium">مسح الفلاتر 🧹</button>
-            </div>
-
-            <!-- Close button for mobile -->
-            <button id="close-filters" class="md:hidden mt-4 w-full bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors">
-                إغلاق الفلاتر ✖️
-            </button>
-        </div>
-
-        <!-- Results Count -->
-        <div id="results-count" class="text-center text-gray-600 dark:text-gray-400 mb-6 font-semibold"></div>
-
-        <!-- Filter Toggle Button (Bottom Right - Backup) -->
-        <button title="Toggle Filters" id="filter-toggle" class="fixed bottom-4 left-4 z-20 bg-red-700 dark:bg-red-600 text-white p-3 rounded-full shadow-lg md:hidden hover:bg-red-800 dark:hover:bg-red-700">
-            <span class="svg-filter-toggle"></span>
-        </button>
-
-        <!-- Results Section -->
-        <main id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Program cards will be injected here by JavaScript -->
-        </main>
-
-        <!-- No Results Message -->
-        <div id="no-results" class="hidden text-center py-20">
-            <span class="svg-no-results mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"></span>
-            <p class="mt-4 text-xl text-gray-500 dark:text-gray-400">لا توجد نتائج مطابقة لبحثك.</p>
-        </div>
-
-        <!-- Share Button -->
-        <button id="share-btn" title="Share Link" class="flex items-center px-3 py-2  bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors text-sm font-medium mt-2">
-            <i class="fa fa-share-alt" aria-hidden="true"></i> </button>
-
-        <!-- Info Modal -->
-        <div id="info-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 max-w-md w-full relative text-right">
-                <button id="close-info" class="absolute top-2 left-2 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
-                <h2 class="text-xl font-bold mb-2 text-blue-700 dark:text-blue-300">عن التطبيق</h2>
-                <p class="mb-4 text-gray-700 dark:text-gray-200">
-                    هذا التطبيق يسهّل عليك استكشاف مجالس ومآتم عاشوراء في البحرين لموسم ١٤٤٧ هـ. يمكنك البحث والتصفية حسب المدينة، القارئ، الوقت، وترتيب النتائج بسهولة. شارك الروابط مع أصدقائك وابقَ على اطلاع على أحدث المجالس القادمة.
-                </p>
-                <ul class="mb-2 text-sm text-gray-700 dark:text-gray-200 space-y-2">
-                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🔍 البحث:</span> ابحث باسم المأتم أو القارئ.</li>
-                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🏙️ المدينة:</span> تصفية النتائج حسب المدينة.</li>
-                    <li><span class="font-bold text-blue-600 dark:text-blue-300">⏰ الوقت:</span> تصفية حسب وقت المجلس.</li>
-                    <li><span class="font-bold text-blue-600 dark:text-blue-300">✔️ تطبيق الفلتر:</span> عرض النتائج حسب الفلاتر المختارة.</li>
-                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🧹 مسح الفلاتر:</span> إعادة تعيين جميع الفلاتر.</li>
-                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🌑 الوضع الليلي:</span> تبديل بين الوضع الليلي والوضع الفاتح.</li>
-                    <li><span class="font-bold text-blue-600 dark:text-blue-300">🔗 مشاركة:</span> مشاركة الرابط الحالي مع الفلاتر المفعلة.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <script src="data.js"></script>
-    <script src="main.js"></script>
-
-</body>
-
-</html>
