@@ -1,6 +1,4 @@
-        // --- Data extracted from the PDF ---
-
-const majalisData = [{
+[{
   
   "city": "المنامة",
   "matam": "حسينية الرسول الأعظم (ص)",
@@ -7697,4 +7695,4 @@ const majalisData = [{
   "location": "",
   "instagram": "",
   "normalizedName": "مأتم الزهراء (ع)"
-}];
+}]
